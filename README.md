@@ -272,11 +272,23 @@ The relationship between the two primitives is precise:
 
 The first without the second leaves provenance as a human responsibility. The second without the first means provenance is captured for agents still bearing the full integrity burden. Together they form a complete account of agentic document editing: scoped authority on the write side, automatic attribution on the record side.
 
-Session provenance capture is a companion primitive, not a corollary of write-domain scoping — it requires its own design, its own protocol-level specification for what information is available at an invocation boundary and how it is conveyed, and its own treatment of the privacy and auditability questions that automatic attribution raises. That treatment is deferred here. What this paper contributes is the observation that the two primitives are genuinely paired: a system that implements write-domain scoping but not session provenance capture has correctly located the write responsibility while leaving the attribution responsibility in the wrong place. The Concept Clusters implementation is honest about occupying exactly that intermediate state.
+Session provenance capture is a companion primitive, not a corollary of write-domain scoping — it requires its own design, its own protocol-level specification for what information is available at an invocation boundary and how it is conveyed, and its own treatment of the privacy and auditability questions that automatic attribution raises. That treatment is deferred here. 
+
+## 11. Why the Primitives are Paired
+
+What this paper contributes is the observation that the two primitives are genuinely paired: a system that implements write-domain scoping but not session provenance capture has correctly located the write responsibility while leaving the attribution responsibility in the wrong place.
+
+The pairing is not incidental. Write-domain scoping answers the question of what an agent may change; session provenance capture answers the question of who changed it and under what conditions. These are not independent concerns — they are two sides of the same accountability gap. A system that scopes write authority without recording who exercised it has enforced a boundary it cannot audit. A system that records provenance without scoping write authority is attributing changes to an agent that was never properly constrained in the first place. Each primitive is weakened by the absence of the other: authority without attribution is unauditable, and attribution without authority is unreliable. The two primitives together constitute a complete account of what happened to a document and who was responsible for it — the minimum condition for meaningful accountability in agentic document editing.
+
+That accountability gap itself has three positions, not two. The first is no provenance capture at all — the round-trip model with attribution entirely absent. The second is partial infrastructure capture: what the Concept Clusters draft_assistance_stamps mechanism achieves, recording tool calls, session identity, and timing automatically at the invocation boundary, while model identity, reasoning configuration, and runtime parameters remain unavailable to the server from the MCP protocol as currently specified and must be supplied by the human author manually. The third is full session provenance capture — the missing primitive — in which all of the above is recorded automatically at the invocation boundary without requiring human presence or manual recording. Concept Clusters occupies the second position honestly: it has closed the gap between no capture and infrastructure capture of the invocation event, while the gap between partial and full capture is precisely where the primitive is needed. Until that gap is closed, the attribution responsibility remains only partly in the right place — further along than the round-trip model left it, but not yet where it belongs.
+
+The symmetry runs in the other direction as well. Just as the system gains accountability on both axes simultaneously — knowing what was changed and by whom — the agent is unburdened on both axes simultaneously. Write-domain scoping removes the integrity obligation outside its domain; session provenance capture removes the self-reporting obligation about its own identity and configuration. An agent operating under both primitives is left with precisely the obligations that are genuinely its own: producing good content within its domain, under conditions it did not have to narrate.
+
+The efficiency gains compound this further. An agent receiving only its domain processes a smaller context, reducing both token cost and inference latency in direct proportion to what it does not own. More significantly, a task correctly scoped to its domain can be matched to a model calibrated for that task — a less resource-intensive model that excels at content judgment, without also needing to be robust against schema corruption it should never have encountered. Write-domain scoping does not merely free the agent to focus; it makes the choice of agent a genuine optimization variable rather than a hedge against integrity failure. The practical consequence is not merely cleaner attribution. It is an agent that can direct its full capacity toward the decisions that actually require judgment — with observed improvements ranging from better performance to the difference between a successful session and a failed one.
 
 ---
 
-## 11. Toward Implementation
+## 12. Toward Implementation
 
 This paper argues for a primitive, not a specification. The implementation details — how write-domain annotations are expressed in a schema language, how infrastructure enforces domain boundaries across different document formats and transport protocols, how merge semantics handle conflicts when multiple agents contribute to the same document — are real engineering problems deserving separate treatment.
 
@@ -310,7 +322,7 @@ No — and the paper should be honest about this. Reference implementations are 
 
 ---
 
-## 12. Conclusion
+## 13. Conclusion
 
 The integrity burden is real, it is compounding, and it is not solvable within the round-trip model of agentic document editing. Every workaround that reduces it does so by approximating a capability the infrastructure does not provide — and adds complexity that must be maintained indefinitely.
 
