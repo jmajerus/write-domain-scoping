@@ -334,4 +334,4 @@ The workarounds will continue to accumulate until the primitive exists. The ques
 
 ---
 
-*The author developed these ideas during work on the Concept Clusters authoring project \[CITATION: jmajerus/concept-clusters\]. The working implementation of the database partitioning approach described in Section 8 is documented at \[CITATION: jmajerus/concept-clusters, docs/STORAGE-DOMAINS.md — to be created\]. This paper was drafted with the assistance of Claude. The ideas are the author's own.*
+*The author developed these ideas during work on the [Concept Clusters](https://github.com/jmajerus/concept-clusters/) authoring project. The working implementation of the database partitioning approach described in Section 8 is documented at [STORAGE-DOMAINS](https://github.com/jmajerus/concept-clusters/blob/main/docs/STORAGE-DOMAINS.md), [PROVENANCE-STAMPS](https://github.com/jmajerus/concept-clusters/blob/main/docs/PROVENANCE-STAMPS.md). This paper was drafted with the assistance of Claude and ChatGPT. The ideas are the author's own.*
