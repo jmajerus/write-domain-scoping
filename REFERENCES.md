@@ -60,3 +60,5 @@ IETF SCITT Architecture. Birkholz, Henk, et al. "An Architecture for Trustworthy
 
 Author names marked `[First Author]` and titles marked with `[Authors]` require verification against the arXiv abstract pages before final publication. All arXiv preprints should be verified for peer-review status and updated venue information before citation in a formally submitted paper.
 
+Companion arguments and implementation links for this paper are indexed in [COMPANIONS.md](COMPANIONS.md).
+
