@@ -12,7 +12,7 @@ public record for the position.
 
 | Document | Role |
 |---|---|
-| [Guidance specialization is not a storage partition](companions/guidance-specialization-vs-storage-domains.md) | Guidance vs ownership axes; why profiles-everywhere cannot replace write domains; Concept Clusters as illustration, with higher-stakes settings (clinical, claims, legal, CMS, …) where the case is clearer |
+| [Guidance specialization is not a storage partition](companions/guidance-specialization-vs-storage-domains.md) | Guidance vs ownership axes; why profiles-everywhere cannot replace write domains; write-once as a lifecycle constraint inside a domain, not a new partition; Concept Clusters as illustration, with higher-stakes settings (clinical, claims, legal, CMS, …) where the case is clearer |
 
 ## Working implementations (Concept Clusters)
 

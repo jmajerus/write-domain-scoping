@@ -88,6 +88,7 @@ storage partition:
 | Pass / phase | Which slice of a domain is in scope now? | No (request argument) | No — phase binds to a domain |
 | Authoring profile | Which design brief applies? | No (request argument) | No — may *span* domains |
 | Document kind / type | Which authored type is this? | Often yes (content-owned metadata) | No |
+| Write-once (lifecycle) | When may an owned field still change? | Annotation on an owned field | No — constraint inside a domain |
 
 A profile may span existing domains without becoming one. Guidance can ask
 an agent to co-design material that will later be saved through more than
@@ -97,6 +98,16 @@ and, where useful, type-specific schema constraints change.
 Document kind or type metadata records specialization on the document. It
 is not a third projection. Browse taxonomy, product line, or folder
 hierarchy remains a separate axis from write ownership.
+
+Write-once is likewise not a domain. It answers *when* an already-owned
+field may still change: authored at creation, immutable on later authored
+saves. It can stack with identity (the match key across versions) without
+replacing it. Cluster or clause ids may be identity without being
+write-once; a document or case id is often both, because moving it splits
+storage identity from document identity. Profiles cannot enforce that
+(an agent can omit or invent the id). Infrastructure can. In Concept
+Clusters the only current write-once field is document `id`; see
+[Write-once fields](https://github.com/jmajerus/concept-clusters/blob/main/docs/STORAGE-DOMAINS.md#write-once-fields).
 
 ### Illustration: Concept Clusters
 
@@ -168,7 +179,9 @@ genre needs its own storage domain.
 When a kind has a mechanically distinct shape, express it as a constraint on
 the shared canonical schema, not as a new domain. Constraints answer “is
 this document valid for its declared kind?” Domains answer “may this agent
-replace this field?”
+replace this field?” Write-once answers a third question: “may this owned
+field still move on this save?” It is a lifecycle constraint, not a new
+owner.
 
 ## Failure modes this distinction prevents
 
