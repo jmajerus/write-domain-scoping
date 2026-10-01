@@ -146,12 +146,12 @@ narrative” — but they cannot be the integrity mechanism.
 
 | Setting | Judgment profiles (examples) | Integrity domains (examples) | Why domains are non-optional |
 |---|---|---|---|
-| Clinical documentation | Note type, specialty brief, coding assist | Clinician narrative vs coded/billing fields vs medication list vs audit/provenance vs EHR system ids | A coding profile must not be allowed to rewrite meds or silently alter signed narrative; omission ≠ deletion of problem lists |
+| Clinical documentation | Note type, specialty brief, coding assist | The note or encounter, distinct from the longitudinal problem list and from the links that point at it | In OpenMRS a diagnosis observation does not write the problem list. In OpenEMR, dropping an issue from an encounter save drops the link, not the issue. TIU can pull the list into note text; that insertion is not the list |
 | Insurance / claims | FNOL intake, adjuster summary, SIU review | Claimant narrative vs coverage determination vs payment instructions vs fraud flags vs system case ids | Guidance for “write a clearer loss description” must not round-trip payment routing or alter locked coverage decisions |
 | Legal / contracts | Clause style, jurisdiction pack, playbook profile | Negotiated terms vs boilerplate library vs signature/notary block vs matter metadata vs DMS versioning | A “friendly tone” profile rewriting commercial terms must not touch signature blocks or matter identifiers |
 | Scientific reporting | Paper section, grant narrative, lab-notebook entry | Results prose vs methods/data references vs authorship/ORCID vs funder compliance vs repository ids | Section profiles improve writing; they must not invent coauthors or mutate dataset DOIs |
 | Software change / RFC | Feature brief, security review, ops runbook | Spec normative text vs ADRs vs approval state vs ticket linkage vs deploy metadata | An implementation profile must not clear approvals or rewrite linked incident ids |
-| Media / CMS | News desk, SEO pack, localization | Body copy vs rights/licensing vs embargo/publish state vs asset ids | SEO guidance must not alter license grants or un-embargo by omission |
+| Media / CMS | News desk, SEO pack, localization | Page text vs who may edit it; post body vs publish status | MediaWiki will not change protection on `action=edit`. Omitting a restriction on `action=protect` removes it. WordPress accepts content and status in one post update |
 
 In each row, **profiles proliferate naturally** (many desks, specialties,
 playbooks) while **domains stay few and stable** (narrative judgment vs
@@ -164,8 +164,13 @@ runtime. Column-level or capability-gated APIs in any one row above already
 justify the primitive more sharply than educational authoring alone —
 Concept Clusters remains the worked example of *having built* the
 approximation, not the existence proof that the problem matters. The
-clinical row is opened as a prospective scene, not a built system, in
-[Clinical documentation, prospectively](clinical-documentation-prospective.md).
+clinical row is checked against OpenMRS, OpenEMR, and VistA-family TIU in
+[Clinical documentation, against the record systems](clinical-documentation-prospective.md).
+The publishing row is the same claim where the writes are easier to see, in
+[A page and a post](page-and-post.md).
+Several writes inside one document — notebook source and outputs, and a
+puzzle's board, shelf, and lesson — are
+[One document, several writes](one-document-several-writes.md).
 
 ## What each lever is for
 

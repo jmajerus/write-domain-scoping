@@ -183,11 +183,11 @@ The counter-argument thus strengthens rather than undermines the paper's positio
 
 ---
 
-## 9. A Proposed Implementation: Database Partitioning in Practice
+## 9. A Working Approximation: Database Partitioning in Practice
 
 *Note: The following describes the working column-level approximation in the Concept Clusters authoring system \[CITATION: jmajerus/concept-clusters, docs/STORAGE-DOMAINS.md\]. It shows how far storage partitioning can carry the primitive, and where a further cut stops paying for itself.*
 
-The counter-argument of Section 7 — that database column partitioning approximates write-domain scoping at the storage layer — points toward a practical path for systems that cannot wait for a first-class infrastructure primitive. This section describes how that approach is being applied in the Concept Clusters authoring system \[CITATION: jmajerus/concept-clusters\], what it achieves, and where its limits surface in practice.
+The counter-argument of Section 8 — that database column partitioning approximates write-domain scoping at the storage layer — points toward a practical path for systems that cannot wait for a first-class infrastructure primitive. This section describes how that approach is being applied in the Concept Clusters authoring system \[CITATION: jmajerus/concept-clusters\], what it achieves, and where its limits surface in practice.
 
 ### The Domain Decomposition
 
@@ -258,9 +258,9 @@ The residual burden is proportionate to the agent's actual domain. The eliminate
 
 ## 10. A Companion Primitive: Session Provenance Capture
 
-*Note: The Concept Clusters workaround described in this section is proposed. It will be revised to reflect the working implementation once complete.*
+*Note: Document provenance and invocation capture, as described here, are implemented in Concept Clusters. Fully attested session provenance — model, configuration, and a verifiable session record — remains the missing primitive.*
 
-The domain decomposition of Section 8 exposes a gap that write-domain scoping alone does not close. The provenance domain — who contributed to a document, under what conditions — is described there as human-controlled. That is not the intended endpoint. It is a workaround for a second missing primitive.
+The domain decomposition of Section 9 exposes a gap that write-domain scoping alone does not close. The provenance domain — who contributed to a document, under what conditions — is described there as human-controlled. That is not the intended endpoint. It is a workaround for a second missing primitive.
 
 The gap is this: an agent cannot reliably report its own identity, model version, or configuration. These facts exist at the invocation boundary — the moment the infrastructure hands the agent its domain — but no current framework captures them there automatically. The result is that provenance must be recorded by whoever is present at that boundary: the human author who initiated the session, who knows which agent was used and at what settings because they controlled for those things themselves.
 
@@ -309,7 +309,7 @@ A few observations are worth making, however, about what an implementation must 
 
 It must be **infrastructure-level**, not convention-level. A write-domain declaration that agents are expected to respect voluntarily is not write-domain scoping. It is a read-only field convention with better documentation. The enforcement must be mechanical and unconditional.
 
-It must be **invisible to agents**. An agent that knows it is operating in a scoped context — that there are fields it cannot see, that its output will be merged with content from other sources — is an agent that might try to reason about or compensate for its constraints. The domain boundary should be transparent: the agent receives its domain as if it were the whole document, and returns its changes as if it were the whole document. The scoping happens entirely in the infrastructure layer.
+It must **scope the write**. The agent may see another domain when that context is what makes its own decision coherent: the shelf on a board pass, the outputs in a notebook. Seeing that fact does not put it in the payload. The agent returns the domain it was given. A change outside that domain does not land, because the infrastructure never accepted it as part of the write. The scoping happens entirely in the infrastructure layer.
 
 It must be **composable**. Real documents have multiple domains with different owners, different lifecycles, and different validation rules. The infrastructure must support composition of domains into complete documents without requiring any single agent or system component to be responsible for the whole.
 
@@ -326,7 +326,7 @@ Write-domain scoping is defined at the interface between the infrastructure and 
 
 **What about handling different backend storage modalities?**
 
-This follows from the first question and asks whether the primitive is genuinely general or only tractable for relational and JSON storage. The answer is that the primitive is general precisely because it is defined at the interface layer. Different backends implement the enforcement differently: a relational store uses column or row partitioning, a document store uses field projection, a file system uses directory isolation or access control lists. The agent-facing contract — here is your domain, everything else does not exist for you — is identical in each case. PatchOptic's future work acknowledges this directly, naming "database updates, file edits, tool calls, and domain-specific operations" as requiring the same source-read discipline as its JSON Patch prototype. The generalization across storage modalities is a motivation for elevating the mechanism to a primitive rather than leaving it as a workflow-step contract tied to one storage representation. Each backend requires its own enforcement adapter; the primitive provides the contract those adapters implement.
+This follows from the first question and asks whether the primitive is genuinely general or only tractable for relational and JSON storage. The answer is that the primitive is general precisely because it is defined at the interface layer. Different backends implement the enforcement differently: a relational store uses column or row partitioning, a document store uses field projection, a file system uses directory isolation or access control lists. The agent-facing contract — here is the domain you may write, and here is any context you may read — is identical in each case. PatchOptic's future work acknowledges this directly, naming "database updates, file edits, tool calls, and domain-specific operations" as requiring the same source-read discipline as its JSON Patch prototype. The generalization across storage modalities is a motivation for elevating the mechanism to a primitive rather than leaving it as a workflow-step contract tied to one storage representation. Each backend requires its own enforcement adapter; the primitive provides the contract those adapters implement.
 
 **Is having reference implementations enough?**
 
@@ -347,4 +347,4 @@ The workarounds will continue to accumulate until the primitive exists. The ques
 
 ---
 
-*The author developed these ideas during work on the [Concept Clusters](https://github.com/jmajerus/concept-clusters/) authoring project. The working implementation of the database partitioning approach described in Section 8 and provenance capture described in section 10 are documented at: [STORAGE-DOMAINS](https://github.com/jmajerus/concept-clusters/blob/main/docs/STORAGE-DOMAINS.md), [PROVENANCE-STAMPS](https://github.com/jmajerus/concept-clusters/blob/main/docs/PROVENANCE-STAMPS.md). Companion arguments for the paper, including the distinction between guidance specialization and storage partitions, are indexed in [COMPANIONS](COMPANIONS.md). This paper was drafted with the assistance of Claude and ChatGPT. The ideas are the author's own.*
+*The author developed these ideas during work on the [Concept Clusters](https://github.com/jmajerus/concept-clusters/) authoring project. The working implementation of the database partitioning approach described in Section 9 and provenance capture described in section 10 are documented at: [STORAGE-DOMAINS](https://github.com/jmajerus/concept-clusters/blob/main/docs/STORAGE-DOMAINS.md), [PROVENANCE-STAMPS](https://github.com/jmajerus/concept-clusters/blob/main/docs/PROVENANCE-STAMPS.md). Companion arguments for the paper, including the distinction between guidance specialization and storage partitions, are indexed in [COMPANIONS](COMPANIONS.md). This paper was drafted with the assistance of Claude, ChatGPT, and Grok. The ideas are the author's own.*

@@ -13,7 +13,9 @@ public record for the position.
 | Document | Role |
 |---|---|
 | [Guidance specialization is not a storage partition](companions/guidance-specialization-vs-storage-domains.md) | Guidance vs ownership axes; why profiles-everywhere cannot replace write domains; when a further domain is justified (the shelf) and when it would only fragment the contract; write-once as a lifecycle constraint inside a domain, not a new partition; Concept Clusters as illustration, with higher-stakes settings (clinical, claims, legal, CMS, …) where the case is clearer |
-| [Clinical documentation, prospectively](companions/clinical-documentation-prospective.md) | The clinical row opened as a prospective scene: narrative, medication list, codes, and filing as separate decisions; a coding profile cannot enforce that cut; the same stopping rule that keeps a form's headings from becoming domains |
+| [Clinical documentation, against the record systems](companions/clinical-documentation-prospective.md) | The clinical claim checked against OpenMRS, OpenEMR, and VistA-family TIU: the problem list is not the note, an encounter save can drop a link without deleting the issue, and pulling a list into note text does not make that list part of the note |
+| [A page and a post](companions/page-and-post.md) | The same claim where the writes are obvious: MediaWiki will not let a text edit change protection, and forgetting a restriction on protect removes it; WordPress still accepts the post body and its publish status in one update |
+| [One document, several writes](companions/one-document-several-writes.md) | Several write domains inside one document: a Jupyter notebook's sources, outputs, and kernel, which Jupytext already reassembles; and a Concept Clusters puzzle's board, shelf, and lesson, which stay one published document |
 
 ## Working implementations (Concept Clusters)
 
@@ -29,3 +31,5 @@ implementation sections.
 ## Bibliographic references
 
 Cited sources for the paper are listed in [REFERENCES.md](REFERENCES.md).
+
+*These companion notes were drafted with the assistance of Grok. The ideas are the author's own.*

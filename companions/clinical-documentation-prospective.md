@@ -1,142 +1,112 @@
-# Clinical documentation, prospectively
+# Clinical documentation, against the record systems
 
 *Companion to [The Integrity Burden](../README.md) and to
 [Guidance specialization is not a storage partition](guidance-specialization-vs-storage-domains.md).
-This note is a prospective scene. It is not an implementation, not a
-proposed electronic-health-record schema, and not clinical, regulatory, or
-privacy advice. [Concept Clusters](https://github.com/jmajerus/concept-clusters/)
-remains the system that was built. Clinical documentation is where the same
-ownership test is easier to see, because a wrong byte is not a bad puzzle.*
+This note is not a theory of every chart. It is what three public systems
+already do, in their own documentation and, where it matters, in their
+source. [Concept Clusters](https://github.com/jmajerus/concept-clusters/)
+remains the authoring system that was built. These are the clinical records
+the ownership claim can be checked against.*
 
-The table in the guidance companion gives the clinical row in one line: a
-coding profile must not rewrite medications or a signed narrative, and
-omitting a problem must not delete it. This note is that line opened up, so
-the cut can be inspected. It uses a discharge summary because that document
-already has several owners in ordinary hospital practice. The names below are
-the decisions, not a field list to implement.
+## The records are already separate
 
-## One document, several decisions
+**OpenMRS** states the split in its information model. A problem list is
+maintained by hand, apart from observations. Recording that a patient has
+"Diagnosis Present = Diabetes" does not add diabetes to the problem list. An
+observation is one moment. A problem is longitudinal: it has a start and an
+end. The allergy list is the same kind of record. Observing a reaction does
+not add the allergy. ([OpenMRS Information Model](https://guide.openmrs.org/getting-started/openmrs-information-model/))
 
-A discharge summary is one chart artifact. It is not one write.
+**OpenEMR** stores medical problems, allergies, medications, surgeries, and
+dental issues as patient issues, on the patient summary, not as the text of
+an encounter. The user guide's reason for that shape is the link: one issue
+can be associated with many encounters, and one encounter with many issues.
+The encounter form does not contain the issue. It records which issues
+belong to this visit. ([OpenEMR 4.1 Users Guide](https://www.open-emr.org/files/OpenEMR_4.1_Users_Guide_V1.pdf),
+"Adding Issues" and "Associating Issues with Encounters")
 
-**Narrative.** What happened, what was concluded, and what the patient was
-told: the hospital course, the assessment, the instructions in the
-clinician's words. This is the judgment a prose pass is for.
+The current source still draws that line in the save. Saving an encounter
+calls `replaceIssuesForEncounter`. An issue id that is no longer posted is
+unlinked: the row in `issue_encounter` is deleted. The issue itself lives in
+`lists` and is updated by a different write, `updateIssue`. Dropping an
+issue from the encounter payload drops the association for that encounter.
+It does not delete the problem, the allergy, or the medication.
+([`PatientIssuesService.php`](https://github.com/openemr/openemr/blob/master/src/Services/PatientIssuesService.php),
+called from the encounter save)
 
-**Medication list.** The reconciled list: drug, dose, route, status. It is
-often decided in a different pass from the course, sometimes by a different
-role, and a sentence in the course that mentions a drug is not the list.
-Omitting the list from a prose save must not discontinue a medication.
+A prescription makes the same distinction on the way in. "Add to Medication
+List" is a separate yes on the prescription form. Saying yes also creates a
+medication issue. The prescription is not the list.
 
-**Codes.** Diagnoses and procedures as coded facts for billing and retrieval.
-Assigning them is a classification judgment of a different kind from telling
-the hospital course. A coder's pass is not an invitation to improve the
-prose, and a prose pass is not competent to invent a billable code because
-the field was sitting in the document.
+**VistA CPRS** puts Problems and Discharge Summaries on different chart
+tabs. A discharge summary is a document. The problem list is not a section
+of it. ([CPRS Clinician's Getting Started Guide](https://www.va.gov/vdl/documents/Clinical/Comp_Patient_Recrd_Sys_(CPRS)_Archive/cprslmum.pdf))
 
-**Filing.** Which problems this note is associated with, and which of those
-are active for this encounter. This is the shelf: where the note lives in
-the chart. It is not the course, and it is not the code set. Changing the
-filing should not require rewriting the course. Editing the course should
-not drop a problem because the problem list was absent from the payload.
+The pull-in the chart actually offers is documented on the VistA text
+system those notes use. In the RPMS EHR, which trains clinicians on that
+Text Integration Utility, a data object extracts data from another package
+and inserts it into the boilerplate of a progress note or a discharge
+summary. The placeholder sits in the template. Medications, allergies, and
+the problem list are among the things those objects are there to pull. What
+lands in the note is text. The source of that text remains the other
+package. ([TIU Data Objects](https://www.ihs.gov/rpms/training/course-materials/?download=1&flname=Tab10_TIU_Data_Objects_LR+2017.pdf&p=rpmstraining%5CHIM+CAC%5CTab10_TIU_Data_Objects_LR+2017.pdf),
+IHS RPMS training)
 
-**Attestation.** Who signed, when, and that this version is the signed one.
-The agent does not author this. After signature, the signed narrative is
-write-once: an addendum is a new write, not a silent rewrite of the signed
-bytes.
+## What the agent is holding
 
-**System.** Patient, encounter, and document identifiers, revision tokens,
-hashes, and the record's lifecycle. The agent does not see them. Reproducing
-an encounter id "helpfully" is the same failure as reproducing a puzzle id.
+An agent asked to revise a discharge summary that already expanded a
+problem-list object is holding note text. The problem list is a different
+record, which the template copied from. Editing a line of that inserted
+text edits the summary. It is not, on the mechanism above, an edit of the
+problem-list package. The copy and the source have already been separated
+by the software that did the pull.
 
-Note type and specialty are not on this list. "Discharge summary" and
-"cardiology" are briefs. They change what the agent is asked to judge. They
-do not change who must preserve which bytes.
+An agent asked to save an OpenEMR encounter while "tidying" the linked
+problems is holding a list of issue ids. Omit one, and the encounter save
+unlinks it. The issue row is untouched, because that save never called the
+issue update. An agent that then rewrites the issue title, because the title
+was visible beside the encounter, has taken a second write the encounter
+form does not perform. OpenMRS is stricter still: a diagnosis observation
+and a problem-list entry are not the same write, and the system will not
+infer one from the other.
 
-## The round trip that fails
+That is the integrity burden in a form a record system already recognizes.
+The note, the encounter link, and the longitudinal list are different
+saves. A profile that says "improve this discharge summary" and then
+round-trips every list the summary can display asks the agent to keep
+straight a set of boundaries the applications drew on purpose.
 
-A coding assist is asked to tighten the coded diagnoses on an already signed
-discharge summary. Under the round-trip model it is handed the note. It
-returns the note. The codes are better. Also, a sentence in the hospital
-course has been smoothed, a medication the model judged redundant is gone,
-and a problem that was not restated in the payload is gone. Each of those
-edits can look like care. Each is an integrity failure in a domain the task
-did not own. Validation after the fact can catch some of them. It cannot
-make the agent a reliable custodian of the fields it had to carry in order
-to be allowed to save.
+## What write-domain scoping claims here
 
-A profile named coding-assist, with a phase schema of the code fields and a
-paragraph that says "do not rewrite the course or the medication list," is
-the workaround the paper already criticizes. Compliance is probabilistic. It
-gets worse as the note gets longer and as the number of "do not touch" rules
-grows. Omission stays ambiguous: the code view did not include the
-medication list, and nothing in the profile makes preservation of that list
-a server obligation.
+A save of the note writes the note. A save of the problem list writes the
+problem list. A save of the encounter writes the encounter and, in
+OpenEMR, the links that encounter is allowed to replace. Pull-in, where TIU
+does it, is an insertion into the note. It is not a merge of the two
+records into one document the agent must return intact.
 
-## What the infrastructure would enforce
+The agent authorized to edit the summary receives the summary. The expanded
+object text may be in it. The problem-list package is not the writable
+document. The agent authorized to maintain the problem list receives the
+problem list. The summary that quoted it earlier may be context. Saving the
+list does not rewrite that earlier snapshot. If both should change, that is
+two authorized writes, which is what these systems already require of a
+person.
 
-The agent receives the domain it is authorized to write, plus read-only
-context for the decisions it must see and must not save.
+Inside the note, the template's headings are still one document. A SOAP
+boilerplate is one TIU document even when it pulls medications into the
+objective section. The seam that pays for itself is the one the record
+already has: the other package, and the link table. A domain per heading
+would invent structure these systems do not have.
 
-A coding pass receives the codes as the writable projection. The course, the
-medication list, and the filing are context. Omitting a medication cannot
-discontinue it, because the medication list is not in the write. Smoothing a
-sentence in the course has no effect, because the course is not in the
-agent's possession. The same pass can still read the course. Coding without
-the course would be a worse judgment, not a purer domain.
+## What is not claimed
 
-A medication-reconciliation pass receives the medication list. It does not
-receive the signed course as a writable document. Guidance may say that a
-changed medication should be reflected in the patient instructions. That is
-a brief spanning two domains, which is legitimate. The medication save still
-does not replace the narrative. If the session is also authorized to change
-the instructions, that is a separate narrative write. The span is in the
-guidance. The seam is in the save.
-
-A filing pass receives the problem associations and their active status,
-with the note's identity as context, not the course and not the codes.
-Re-filing many notes is one infrastructure call over that projection. It is
-not a per-note rewrite of the hospital course. This is the same payoff as a
-shelf move in the built example: the later edit that is *about* placement
-does not carry the rest of the document, and the later edit that is *not*
-about placement cannot drop the placement.
-
-A first composition can still be one complete document, when the session is
-authorized for every clinical domain it is authoring. The server partitions
-on store. Later passes do not reassemble the chart in the agent's context.
-Signature is not part of that composition. It is infrastructure, and once
-applied it freezes the signed narrative against later authored saves.
-
-## Where the cut stops
-
-The failure mode to avoid is a domain per section of the form. History,
-exam, assessment, and plan are one narrative decision even when the screen
-has four headings. A phase can focus the agent on the assessment. The save
-still owns the narrative. Splitting those headings into columns would make
-the agent keep a mental index of fragments and reconstruct the note before
-it could write a paragraph. That is the integrity burden in a new costume.
-
-The same stop applies inside the other decisions. The medication list is one
-domain, not a domain per drug. The code set is one domain, not a domain per
-vocabulary. Filing is one domain, not a domain per problem. The test that
-justified the four clinical seams above is the same test that refuses a
-fifth: a further domain pays for itself only when a later pass must not
-carry or clobber that decision, and when changing that decision must not
-require the other passes. A heading inside the course fails the test. The
-medication list passes it.
-
-## What this does not claim
-
-- It does not claim a hospital should store a discharge summary as six JSON
-  columns, or that these names match any particular record system.
-- It does not claim an agent should sign, code, or discontinue medications.
-  Authority to write a domain is a clinical and legal question. The
-  primitive only says that whoever is authorized writes that domain and no
-  other.
-- It does not claim profiles are useless here. Discharge-summary,
-  specialty, and coding-assist briefs are how the judgment gets specific.
-  They remain briefs. They do not become the integrity mechanism.
-- It does not claim the other rows in the guidance companion are thinner
-  problems. Claims, contracts, scientific reporting, and editorial systems
-  have the same shape. This note opens one row so the shape can be checked
-  against a document people already know has more than one owner.
+These three systems do not become a specification for any other product.
+OpenEMR's encounter save is allowed to change links, and that is a real
+write, scoped to `issue_encounter`. TIU's documented operation is insertion
+into the note; this note does not go on to claim how every later edit of
+the expanded text behaves in every site's template. The argument does not
+need that. The split between the note, the link, and the list is already
+in the software, and an agent that is handed all three as one document has
+been given a job the record system refused to make one job. The same refusal,
+on a document that does not require a chart to see, is
+[a page and a post](page-and-post.md).
