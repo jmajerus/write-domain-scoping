@@ -163,7 +163,9 @@ Proposable near-term systems need not wait for a universal document
 runtime. Column-level or capability-gated APIs in any one row above already
 justify the primitive more sharply than educational authoring alone —
 Concept Clusters remains the worked example of *having built* the
-approximation, not the existence proof that the problem matters.
+approximation, not the existence proof that the problem matters. The
+clinical row is opened as a prospective scene, not a built system, in
+[Clinical documentation, prospectively](clinical-documentation-prospective.md).
 
 ## What each lever is for
 

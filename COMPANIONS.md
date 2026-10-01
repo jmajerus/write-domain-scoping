@@ -13,6 +13,7 @@ public record for the position.
 | Document | Role |
 |---|---|
 | [Guidance specialization is not a storage partition](companions/guidance-specialization-vs-storage-domains.md) | Guidance vs ownership axes; why profiles-everywhere cannot replace write domains; when a further domain is justified (the shelf) and when it would only fragment the contract; write-once as a lifecycle constraint inside a domain, not a new partition; Concept Clusters as illustration, with higher-stakes settings (clinical, claims, legal, CMS, …) where the case is clearer |
+| [Clinical documentation, prospectively](companions/clinical-documentation-prospective.md) | The clinical row opened as a prospective scene: narrative, medication list, codes, and filing as separate decisions; a coding profile cannot enforce that cut; the same stopping rule that keeps a form's headings from becoming domains |
 
 ## Working implementations (Concept Clusters)
 
