@@ -96,8 +96,13 @@ one owned surface. Ownership stays on the integrity domains; only briefs
 and, where useful, type-specific schema constraints change.
 
 Document kind or type metadata records specialization on the document. It
-is not a third projection. Browse taxonomy, product line, or folder
-hierarchy remains a separate axis from write ownership.
+is not itself a write domain. A browse shelf can be one, when keeping that
+placement intact across other writes — and changing it without those writes —
+is its own integrity responsibility. In Concept Clusters, primary category,
+membership, and subcategory placement are the `classification` domain. The
+shelf is still not document kind, not an authoring profile, and not a phase.
+A label that does not carry that preservation burden — a product line, a
+folder, a desk — does not become a domain merely by being how people browse.
 
 Write-once is likewise not a domain. It answers *when* an already-owned
 field may still change: authored at creation, immutable on later authored
@@ -111,10 +116,22 @@ Clusters the only current write-once field is document `id`; see
 
 ### Illustration: Concept Clusters
 
-In Concept Clusters, the map is concrete: `content` / `pedagogy` /
-`provenance` / `system` domains; MCP `profile=` for vocabulary-context or
-trivia-quiz briefs; `puzzleKind` as content metadata; category as browse
-taxonomy. Profiles there span content and pedagogy without new columns.
+In Concept Clusters, the map is concrete: `content` / `classification` /
+`pedagogy` / `provenance` / `system`. `content` is the board,
+`classification` is the shelf (primary category, membership, and subcategory
+placement), and `pedagogy` is the lesson plus the discovery metadata that
+travels with it. MCP `profile=` selects a vocabulary-context or trivia-quiz
+brief. Those profiles span content and pedagogy and do not add a column.
+`puzzleKind` remains content metadata. Classification is not profile-specific:
+every document has a shelf, and a profile does not choose it.
+
+The shelf was added because responsibility moved. A later board or lesson
+edit was carrying placement it was not deciding, and a reclassification was
+a lesson edit. The first write still accepts the home on the complete
+document; the server files it in the classification projection. Tags, level,
+related puzzles, and language stayed in pedagogy. The test that stopped a
+further split is the one in the paper's implementation section: do not add a
+domain when the agent would have to reconstruct the document from fragments.
 That system motivated the paper; it is evidence that the axes collide in
 practice, not a claim that educational puzzles are the primary market for
 the primitive.
@@ -192,9 +209,10 @@ owner.
    differences.
 3. **False completeness** — treating a profile brief as a whole-document
    replacement contract, or treating a phase projection as a domain.
-4. **Cross-axis conflation** — agents set taxonomy category instead of
-   document kind, or request a profile without recording the kind, because
-   the system appeared to treat those as interchangeable selectors.
+4. **Cross-axis conflation** — agents set the shelf instead of document kind,
+   or request a profile as if it chose placement, because those selectors
+   were easy to treat as interchangeable. Owning the shelf as `classification`
+   does not make it `puzzleKind` or a profile.
 
 Keeping the axes separate makes each failure diagnosable: wrong guidance is
 a profile/skill problem; lost sibling fields are a domain/merge problem;
@@ -294,9 +312,13 @@ them as the place integrity lives.**
   Compatibility paths remain; the thesis is about where integrity *belongs*,
   not about deleting escape hatches on day one.
 - It does not claim every future specialization fits the existing integrity
-  domains. A new domain is justified only when a new *owner* appears — for
-  example a class of fields that agents must not see or must never
-  round-trip — not when a new teaching genre appears.
+  domains. A new domain is justified when integrity responsibility moves: a
+  class of fields with a different owner, including fields the agent does
+  write but must not round-trip through unrelated saves. It is not justified
+  by a new teaching genre, and it is not justified when the split would make
+  the agent reconstruct the document from fragments. Concept Clusters added
+  `classification` for the shelf under the first test and left tags, level,
+  related puzzles, and language in pedagogy under the second.
 
 ## Relation to the main paper
 

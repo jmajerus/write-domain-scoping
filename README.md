@@ -185,17 +185,19 @@ The counter-argument thus strengthens rather than undermines the paper's positio
 
 ## 9. A Proposed Implementation: Database Partitioning in Practice
 
-*Note: The following describes a proposed implementation in the Concept Clusters authoring system \[CITATION: jmajerus/concept-clusters, docs/STORAGE-DOMAINS.md — document to be created\]. It will be revised to reflect the working implementation once complete.*
+*Note: The following describes the working column-level approximation in the Concept Clusters authoring system \[CITATION: jmajerus/concept-clusters, docs/STORAGE-DOMAINS.md\]. It shows how far storage partitioning can carry the primitive, and where a further cut stops paying for itself.*
 
 The counter-argument of Section 7 — that database column partitioning approximates write-domain scoping at the storage layer — points toward a practical path for systems that cannot wait for a first-class infrastructure primitive. This section describes how that approach is being applied in the Concept Clusters authoring system \[CITATION: jmajerus/concept-clusters\], what it achieves, and where its limits surface in practice.
 
 ### The Domain Decomposition
 
-The Concept Clusters puzzle document, as evolved through agent-assisted authoring, naturally decomposes into four distinct ownership domains:
+The Concept Clusters puzzle document, as evolved through agent-assisted authoring, decomposes into five ownership domains. Three of them are agent-writable. They are separated by decision, not by how the first implementation happened to store the fields.
 
-**Content** — the educational core that agents are hired to produce: cluster names, term lists, seed pairs, bridge facts, lens prompts and explanations, learning introduction prose. This is what requires knowledge, judgment, and creativity. It is the agent's domain.
+**Content** — the board: puzzle identity and copy, clusters, terms, and bridge cores. This is what requires knowledge, judgment, and creativity about the educational material.
 
-**Pedagogy** — structural annotations layered on top of content: lens sequences, bridge relationship kinds, bridge directions, ideal terms. These require authoring judgment but are more mechanical than content and are frequently the source of misclassification errors when agents handle them alongside richer content tasks. Separable from content but still agent-authored.
+**Classification** — the shelf: primary category, full membership, and subcategory placement. One fact, where the puzzle lives. It is agent-authored, and it is not the board and not the lesson.
+
+**Pedagogy** — the lesson and the discovery metadata that travels with it: lenses, learning introductions, bridge relationship annotations, tags, level, related puzzles, and language. These require authoring judgment, and several of them are more mechanical than the board. They are separable from content, and they are still not the shelf.
 
 **Provenance** — who contributed to this puzzle, in what order, with what tools. Currently a flat ordered array of contributor names. The first entry is the drafter by convention; subsequent entries are collaborators. This domain is human-controlled: the author initiates the session, knows the agent and its configuration, and records that information directly. Agents do not write to this domain.
 
@@ -203,17 +205,18 @@ The Concept Clusters puzzle document, as evolved through agent-assisted authorin
 
 ### The Storage Model
 
-Each domain maps to a separate JSON column in the D1 database backing the authoring worker \[CITATION: jmajerus/concept-clusters, docs/STORAGE-DOMAINS.md\]:
+The agent-writable domains, and provenance, each map to a JSON column in the D1 database backing the authoring worker \[CITATION: jmajerus/concept-clusters, docs/STORAGE-DOMAINS.md\]. System state stays in repository columns:
 
 ```
 puzzle_drafts
-  content      JSON   -- agent write domain
-  pedagogy     JSON   -- agent write domain (separate pass)
-  provenance   JSON   -- human write domain
-  system       JSON   -- infrastructure write domain
+  content           JSON   -- agent write domain: the board
+  classification    JSON   -- agent write domain: the shelf
+  pedagogy          JSON   -- agent write domain: the lesson
+  provenance        JSON   -- protected attribution
+  system            —      -- repository columns, not an agent document
 ```
 
-The authoring API presents each domain separately. When an agent is asked to draft educational content, it receives only the `content` column. When it is asked to annotate bridge relationships, it receives only the `pedagogy` column — with the content visible as read-only context but not as part of its write surface. The merge that produces a complete document for export or publication is performed by the infrastructure, not by the agent.
+The authoring API presents each agent domain separately. A board pass receives content, with the shelf as read-only context. A lesson pass receives pedagogy, with the board and the shelf as read-only context. A placement pass receives classification, with only the puzzle's identity as read-only context — not the clusters and not the lenses. The merge that produces a complete document for export or publication is performed by the infrastructure, not by the agent.
 
 ### What This Achieves
 
@@ -222,6 +225,16 @@ The most immediate benefit is the elimination of hallucinated metadata. Fields t
 The provenance domain's separation is particularly clean. Because the author controls session initiation and knows the contributing agent and its configuration, provenance is recorded once at session start, never touched by the agent, and available for review throughout the authoring process as a visible byline. The agent's contribution to provenance is its output, not its self-report.
 
 System fields — previously a source of round-trip corruption as agents reproduced auto-assigned identifiers in subtly wrong forms — are entirely invisible to agents. The canonicalization logic that previously had to run on every agent save, correcting structural normalizations the agent introduced, is reduced to a thin merge step combining clean domain outputs.
+
+The shelf shows the same benefit on a later edit. A board save and a lesson save cannot move or drop placement, because those fields are not in their write surface. A placement save replaces only the shelf. Moving many puzzles is one infrastructure call over that projection, not a per-document lesson edit. The first composition does not grow a mandatory extra round trip: the home may still be set on the complete document when the draft is created, and the server files it in the classification projection. The separate pass is for changing the shelf.
+
+### When another domain stops paying off
+
+Classification is the example of a domain added after the first cut, and of the reason not to keep cutting.
+
+The shelf used to ride on two write paths: primary category on the board save, membership and subcategory placement on the lesson save. One decision had been split across two mechanisms. A later edit of either path had to carry the shelf or risk clearing it, and moving a puzzle looked like editing the lesson. That is an integrity burden. Giving the decision its own domain removes it from the passes that are not making it.
+
+The stopping rule is the mirror image. A further domain pays for itself when it takes a real decision, and the integrity of that decision, off the passes that are not making it. It stops paying when the agent must keep a mental index of fragments and reconstruct the document before it can act. Tags, level, related puzzles, and language stayed with the lesson. Changing them is not a different decision from the rest of that discovery metadata. Splitting each into its own domain would spend the agent's attention on remembering which fragment holds which fact, which is the integrity burden in a new costume. The infrastructure already reassembles the domains. The agent should not have to.
 
 ### Where the Limits Surface
 
