@@ -191,13 +191,15 @@ The counter-argument of Section 8 — that database column partitioning approxim
 
 ### The Domain Decomposition
 
-The Concept Clusters puzzle document, as evolved through agent-assisted authoring, decomposes into five ownership domains. Three of them are agent-writable. They are separated by decision, not by how the first implementation happened to store the fields.
+The Concept Clusters puzzle document, as evolved through agent-assisted authoring, decomposes into six ownership domains. Four of them are agent-writable. They are separated by decision, not by how the first implementation happened to store the fields.
 
 **Content** — the board: puzzle identity and copy, clusters, terms, and bridge cores. This is what requires knowledge, judgment, and creativity about the educational material.
 
-**Classification** — the shelf: primary category, full membership, and subcategory placement. One fact, where the puzzle lives. It is agent-authored, and it is not the board and not the lesson.
+**Classification** — the shelf: primary category, full membership, subcategory placement, search tags, and optional level. Where the puzzle lives and how readers browse to it.
 
-**Pedagogy** — the lesson and the discovery metadata that travels with it: lenses, learning introductions, bridge relationship annotations, tags, level, related puzzles, and language. These require authoring judgment, and several of them are more mechanical than the board. They are separable from content, and they are still not the shelf.
+**Pedagogy** — the lenses and relationships: Concept Lenses, bridge relationship annotations, related puzzles, and language. Post-solve reclassification and discovery metadata that build on the solved board.
+
+**Lesson** — the introductory prose: `learningIntroduction` Markdown read before play, paired with an identity-merged write into `info.citations` so a quoted or relied-upon work joins the puzzle's single bibliography in the same save.
 
 **Provenance** — who contributed to this puzzle, in what order, with what tools. Currently a flat ordered array of contributor names. The first entry is the drafter by convention; subsequent entries are collaborators. This domain is human-controlled: the author initiates the session, knows the agent and its configuration, and records that information directly. Agents do not write to this domain.
 
@@ -205,18 +207,19 @@ The Concept Clusters puzzle document, as evolved through agent-assisted authorin
 
 ### The Storage Model
 
-The agent-writable domains, and provenance, each map to a JSON column in the D1 database backing the authoring worker \[CITATION: jmajerus/concept-clusters, docs/STORAGE-DOMAINS.md\]. System state stays in repository columns:
+The agent-writable domains, and provenance, each map to a JSON column in the D1 and Postgres databases backing the authoring server \[CITATION: jmajerus/concept-clusters, docs/STORAGE-DOMAINS.md\]. System state stays in repository columns:
 
 ```
 puzzle_drafts
   content           JSON   -- agent write domain: the board
   classification    JSON   -- agent write domain: the shelf
-  pedagogy          JSON   -- agent write domain: the lesson
+  pedagogy          JSON   -- agent write domain: lenses and relationships
+  lesson            JSON   -- agent write domain: the learning introduction
   provenance        JSON   -- protected attribution
   system            —      -- repository columns, not an agent document
 ```
 
-The authoring API presents each agent domain separately. A board pass receives content, with the shelf as read-only context. A lesson pass receives pedagogy, with the board and the shelf as read-only context. A placement pass receives classification, with only the puzzle's identity as read-only context — not the clusters and not the lenses. The merge that produces a complete document for export or publication is performed by the infrastructure, not by the agent.
+The authoring API presents each agent domain separately. A board pass receives content, with the shelf as read-only context. A pedagogy pass receives lenses and bridge annotations, with the board and the shelf as read-only context. A lesson pass receives the learning introduction and existing citations, with only the subject (clusters and bridge facts) as read-only context and the lenses withheld. A placement pass receives classification, with only the puzzle's identity as read-only context. The merge that produces a complete document for export or publication is performed by the infrastructure, not by the agent.
 
 ### What This Achieves
 
@@ -226,15 +229,17 @@ The provenance domain's separation is particularly clean. Because the author con
 
 System fields — previously a source of round-trip corruption as agents reproduced auto-assigned identifiers in subtly wrong forms — are entirely invisible to agents. The canonicalization logic that previously had to run on every agent save, correcting structural normalizations the agent introduced, is reduced to a thin merge step combining clean domain outputs.
 
-The shelf shows the same benefit on a later edit. A board save and a lesson save cannot move or drop placement, because those fields are not in their write surface. A placement save replaces only the shelf. Moving many puzzles is one infrastructure call over that projection, not a per-document lesson edit. The first composition does not grow a mandatory extra round trip: the home may still be set on the complete document when the draft is created, and the server files it in the classification projection. The separate pass is for changing the shelf.
+The shelf shows the same benefit on a later edit. A board save, a pedagogy save, and a lesson save cannot move or drop placement, because those fields are not in their write surface. A placement save replaces only the shelf. Moving many puzzles is one infrastructure call over that projection, rather than a per-document edit. The first composition does not grow a mandatory extra round trip: the home may still be set on the complete document when the draft is created, and the server files it in the classification projection. The separate pass is for changing the shelf.
 
 ### When another domain stops paying off
 
-Classification is the example of a domain added after the first cut, and of the reason not to keep cutting.
+Classification and lesson are examples of domains added after the first cut, and of the reason not to keep cutting.
 
-The shelf used to ride on two write paths: primary category on the board save, membership and subcategory placement on the lesson save. One decision had been split across two mechanisms. A later edit of either path had to carry the shelf or risk clearing it, and moving a puzzle looked like editing the lesson. That is an integrity burden. Giving the decision its own domain removes it from the passes that are not making it.
+The shelf used to ride on two write paths: primary category on the board save, membership and subcategory placement on the pedagogy save (later joined by search tags and level). One decision had been split across two mechanisms. A later edit of either path had to carry the shelf or risk clearing it, and moving a puzzle rewrote projections that held its board or lenses. Giving the shelf its own domain removes it from the passes that are not making that decision.
 
-The stopping rule is the mirror image. A further domain pays for itself when it takes a real decision, and the integrity of that decision, off the passes that are not making it. It stops paying when the agent must keep a mental index of fragments and reconstruct the document before it can act. Tags, level, related puzzles, and language stayed with the lesson. Changing them is not a different decision from the rest of that discovery metadata. Splitting each into its own domain would spend the agent's attention on remembering which fragment holds which fact, which is the integrity burden in a new costume. The infrastructure already reassembles the domains. The agent should not have to.
+The learning introduction followed the same test once prose authoring grew its own corpus, quotation, and semantic-block tools. While `learningIntroduction` sat inside pedagogy, revising a paragraph meant holding the lens apparatus in context — where lens prompts invited the essay to become a walkthrough of gameplay mechanics — and quoting a source required a follow-up content save to update `info.citations`. Moving the introduction into `lesson` withholds the lenses from the writing pass and lets a lesson save merge bibliography entries by identity into `info.citations` while preserving one puzzle-level bibliography.
+
+The stopping rule is the mirror image. A further domain pays for itself when it takes a real decision, and the integrity or context boundary of that decision, off the passes that are not making it. It stops paying when the agent must keep a mental index of fragments and reconstruct the document before it can act. Related puzzles and language stayed in pedagogy, and `info.citations` stayed one bibliography on content rather than a second list on the lesson. Splitting small stewardship fields into further domains would spend the agent's attention on remembering which fragment holds which fact, which is the integrity burden in a new costume. The infrastructure already reassembles the domains. The agent should not have to.
 
 ### Where the Limits Surface
 

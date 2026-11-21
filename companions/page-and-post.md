@@ -81,7 +81,7 @@ a section, and the page is still one text write. A domain per section
 would make the agent reassemble the article. The seam that is already
 visible is text versus protection, and body versus publish state. Several
 writes inside one file — a notebook's sources and outputs, a puzzle's
-board, shelf, and lesson — are
+board, shelf, lenses, and lesson — are
 [One document, several writes](one-document-several-writes.md).
 
 ## What is not claimed

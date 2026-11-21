@@ -117,21 +117,28 @@ Clusters the only current write-once field is document `id`; see
 ### Illustration: Concept Clusters
 
 In Concept Clusters, the map is concrete: `content` / `classification` /
-`pedagogy` / `provenance` / `system`. `content` is the board,
-`classification` is the shelf (primary category, membership, and subcategory
-placement), and `pedagogy` is the lesson plus the discovery metadata that
-travels with it. MCP `profile=` selects a vocabulary-context or trivia-quiz
+`pedagogy` / `lesson` / `provenance` / `system`. `content` is the board,
+`classification` is the shelf (primary category, membership, subcategory
+placement, search tags, and optional level), `pedagogy` is the lenses, bridge
+relationship annotations, related puzzles, and language, and `lesson` is the
+introductory essay (`learningIntroduction`, plus an identity-merged write into
+`info.citations`). MCP `profile=` selects a vocabulary-context or trivia-quiz
 brief. Those profiles span content and pedagogy and do not add a column.
-`puzzleKind` remains content metadata. Classification is not profile-specific:
-every document has a shelf, and a profile does not choose it.
+`puzzleKind` remains content metadata. Classification and lesson are
+profile-independent: every document has a shelf, and any puzzle may carry an
+introductory lesson without changing its profile.
 
-The shelf was added because responsibility moved. A later board or lesson
-edit was carrying placement it was not deciding, and a reclassification was
-a lesson edit. The first write still accepts the home on the complete
-document; the server files it in the classification projection. Tags, level,
-related puzzles, and language stayed in pedagogy. The test that stopped a
-further split is the one in the paper's implementation section: do not add a
-domain when the agent would have to reconstruct the document from fragments.
+Both later cuts happened because responsibility or context boundaries moved.
+For `classification`, board and pedagogy edits were carrying placement they
+were not deciding, and reclassifying puzzles meant editing projections that
+held boards or lenses. For `lesson`, keeping `learningIntroduction` inside
+pedagogy handed the lens apparatus to a prose-writing pass — pulling essays
+toward gameplay walkthroughs — while citing a quoted book required a second
+content save. Splitting `lesson` withholds the lenses from the prose read and
+merges quotation sources into the single bibliography in one save. Related
+puzzles and language stayed in pedagogy under the stopping rule in the paper's
+implementation section: do not add a domain when the agent would have to
+reconstruct the document from fragments.
 That system motivated the paper; it is evidence that the axes collide in
 practice, not a claim that educational puzzles are the primary market for
 the primitive.
@@ -169,7 +176,7 @@ clinical row is checked against OpenMRS, OpenEMR, and VistA-family TIU in
 The publishing row is the same claim where the writes are easier to see, in
 [A page and a post](page-and-post.md).
 Several writes inside one document — notebook source and outputs, and a
-puzzle's board, shelf, and lesson — are
+puzzle's board, shelf, lenses, and lesson — are
 [One document, several writes](one-document-several-writes.md).
 
 ## What each lever is for
@@ -324,8 +331,9 @@ them as the place integrity lives.**
   write but must not round-trip through unrelated saves. It is not justified
   by a new teaching genre, and it is not justified when the split would make
   the agent reconstruct the document from fragments. Concept Clusters added
-  `classification` for the shelf under the first test and left tags, level,
-  related puzzles, and language in pedagogy under the second.
+  `classification` for the shelf and `lesson` for the introductory prose under
+  the first test, and left related puzzles and language in pedagogy under the
+  second.
 
 ## Relation to the main paper
 
