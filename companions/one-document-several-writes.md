@@ -52,27 +52,33 @@ Source versus output is an easy owner to see, because one of them is not
 the author. A document can also contain several decisions that *are*
 authored, and that still must not ride on each other's saves.
 
-A Concept Clusters puzzle is one document. Three of its writes are agent
+A Concept Clusters puzzle is one document. Four of its writes are agent
 writes, and they are different decisions. The board is the clusters, the
-terms, and the bridges. The shelf is where the puzzle is filed: primary
-category, membership, and subcategory placement. The lesson is the lenses
-and the discovery metadata that travels with them. Provenance and system
-state are not agent writes. The stored form keeps the agent writes in
-separate projections. A lesson save does not receive the shelf. A shelf
-save does not receive the board. The published puzzle is still one
-document, reassembled by the server.
+terms, and the bridges. The shelf is where the puzzle is filed and found:
+primary category, membership, subcategory placement, search tags, and
+optional level. Pedagogy is the lenses, bridge relationship annotations,
+related puzzles, and language. Lesson is the introductory essay before
+play, read against the subject with the lenses withheld, and allowed to
+merge cited works into the puzzle's single `info.citations` bibliography.
+Provenance and system state are not agent writes. The stored form keeps
+the agent writes in separate projections. A pedagogy save does not receive
+the lesson. A lesson save does not receive the lenses. A shelf save does
+not receive the board. The published puzzle is still one document,
+reassembled by the server.
 ([STORAGE-DOMAINS.md](https://github.com/jmajerus/concept-clusters/blob/main/docs/STORAGE-DOMAINS.md))
 
 The first write can still be the whole document. The server files each
 part in its projection. Later, the pass that is not about the shelf does
-not carry the shelf, and the pass that is only about the shelf does not
-rewrite the lesson. That is the same assembly Jupytext does for outputs,
-applied to decisions the agent does make, and must not make all at once.
+not carry the shelf, the pass that writes prose does not carry the lenses,
+and the pass that edits lenses does not rewrite the essay. That is the
+same assembly Jupytext does for outputs, applied to decisions the agent
+does make, and must not make all at once.
 
-Tags, level, and related puzzles stay with the lesson. They are not a
-fourth agent domain. A further cut would pay for itself only if a later
-pass had to stop carrying that decision, and a change to that decision had
-to stop rewriting the others. Short of that, another projection is another
+Related puzzles and language stay in pedagogy, and citations stay one
+puzzle-level list rather than a second bibliography on the lesson. A
+further cut would pay for itself only if a later pass had to stop
+carrying that decision, and a change to that decision had to stop
+rewriting the others. Short of that, another projection is another
 fragment the agent has to remember.
 
 ## What is not claimed
