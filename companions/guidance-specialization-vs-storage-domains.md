@@ -128,15 +128,20 @@ brief. Those profiles span content and pedagogy and do not add a column.
 profile-independent: every document has a shelf, and any puzzle may carry an
 introductory lesson without changing its profile.
 
-Both later cuts happened because responsibility or context boundaries moved.
-For `classification`, board and pedagogy edits were carrying placement they
-were not deciding, and reclassifying puzzles meant editing projections that
-held boards or lenses. For `lesson`, keeping `learningIntroduction` inside
-pedagogy handed the lens apparatus to a prose-writing pass — pulling essays
-toward gameplay walkthroughs — while citing a quoted book required a second
-content save. Splitting `lesson` withholds the lenses from the prose read and
-stores quotation sources in `lesson`'s column for read-time union into the
-single bibliography. Related
+Both later cuts happened because responsibility, tool surface, or context
+boundaries moved. For `classification`, board and pedagogy edits were carrying
+placement they were not deciding, and reclassifying puzzles meant editing
+projections that held boards or lenses. For `lesson`, prose authoring uses a
+separate multi-server research and publishing tool loop (holdings search,
+passage reading, quote verification, citekey filing, and embedded or
+Ghost-linked essay composition) whose cognitive mode is orthogonal to board
+topology and lens mechanics. Keeping `learningIntroduction` inside pedagogy
+handed the lens apparatus to a prose-writing pass — pulling essays toward
+gameplay walkthroughs — while citing a quoted book required a second content
+save. Splitting `lesson` lets a prose-configured session own `domain="lesson"`
+without write access to the board, shelf, or lenses, withholds the lenses from
+the prose read, and stores quotation sources in `lesson`'s column for
+read-time union into the single bibliography. Related
 puzzles and language stayed in pedagogy under the stopping rule in the paper's
 implementation section: do not add a domain when the agent would have to
 reconstruct the document from fragments.
