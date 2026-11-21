@@ -121,8 +121,8 @@ In Concept Clusters, the map is concrete: `content` / `classification` /
 `classification` is the shelf (primary category, membership, subcategory
 placement, search tags, and optional level), `pedagogy` is the lenses, bridge
 relationship annotations, related puzzles, and language, and `lesson` is the
-introductory essay (`learningIntroduction`, plus an identity-merged write into
-`info.citations`). MCP `profile=` selects a vocabulary-context or trivia-quiz
+introductory essay (`learningIntroduction`, plus write-local `info.citations`
+entries unioned at read time into the puzzle bibliography). MCP `profile=` selects a vocabulary-context or trivia-quiz
 brief. Those profiles span content and pedagogy and do not add a column.
 `puzzleKind` remains content metadata. Classification and lesson are
 profile-independent: every document has a shelf, and any puzzle may carry an
@@ -135,7 +135,8 @@ held boards or lenses. For `lesson`, keeping `learningIntroduction` inside
 pedagogy handed the lens apparatus to a prose-writing pass — pulling essays
 toward gameplay walkthroughs — while citing a quoted book required a second
 content save. Splitting `lesson` withholds the lenses from the prose read and
-merges quotation sources into the single bibliography in one save. Related
+stores quotation sources in `lesson`'s column for read-time union into the
+single bibliography. Related
 puzzles and language stayed in pedagogy under the stopping rule in the paper's
 implementation section: do not add a domain when the agent would have to
 reconstruct the document from fragments.
