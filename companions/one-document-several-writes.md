@@ -58,8 +58,9 @@ terms, and the bridges. The shelf is where the puzzle is filed and found:
 primary category, membership, subcategory placement, search tags, and
 optional level. Pedagogy is the lenses, bridge relationship annotations,
 related puzzles, and language. Lesson is the introductory essay before
-play, read against the subject with the lenses withheld, and allowed to
-merge cited works into the puzzle's single `info.citations` bibliography.
+play, read against the subject with the lenses withheld, and carrying its
+own write-local citation entries that read-time assembly unions with
+`content`'s into the puzzle's single `info.citations` bibliography.
 Provenance and system state are not agent writes. The stored form keeps
 the agent writes in separate projections. A pedagogy save does not receive
 the lesson. A lesson save does not receive the lenses. A shelf save does
@@ -74,8 +75,9 @@ and the pass that edits lenses does not rewrite the essay. That is the
 same assembly Jupytext does for outputs, applied to decisions the agent
 does make, and must not make all at once.
 
-Related puzzles and language stay in pedagogy, and citations stay one
-puzzle-level list rather than a second bibliography on the lesson. A
+Related puzzles and language stay in pedagogy, and citations do not grow a
+fifth write domain: `content` and `lesson` each keep write-local entries
+that union into one puzzle-level bibliography at read time. A
 further cut would pay for itself only if a later pass had to stop
 carrying that decision, and a change to that decision had to stop
 rewriting the others. Short of that, another projection is another
