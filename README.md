@@ -233,6 +233,8 @@ The shelf shows the same benefit on a later edit. A board save, a pedagogy save,
 
 ### When another domain stops paying off
 
+>"Splitting small stewardship fields into further domains would spend the agent's attention on remembering which fragment holds which fact, which is the integrity burden in a new costume."
+
 Classification and lesson are examples of domains added after the first cut, and of the reason not to keep cutting.
 
 The shelf used to ride on two write paths: primary category on the board save, membership and subcategory placement on the pedagogy save (later joined by search tags and level). One decision had been split across two mechanisms. A later edit of either path had to carry the shelf or risk clearing it, and moving a puzzle rewrote projections that held its board or lenses. Giving the shelf its own domain removes it from the passes that are not making that decision.
